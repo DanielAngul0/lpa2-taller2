@@ -4,7 +4,9 @@ Sistema completo de generación de facturas, utilizando [FastAPI](https://fastap
 
 ## Autor
 
-- Nombre del Estudiante - @perfil_de_github
+### Estudiante: Daniel Andres Angulo Perez
+
+## [@DanielAngul0](https://github.com/DanielAngul0)
 
 ## Descripción del Proyecto
 
