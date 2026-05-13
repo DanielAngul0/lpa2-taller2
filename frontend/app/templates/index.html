@@ -3,29 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Facturas</title>
+    <title>Generador de Facturas PDF</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Generador de Facturas PDF</h1>
-        <form method="POST" action="/generar-pdf">
-            <div class="form-group">
-                <label for="id_factura">ID de Factura:</label>
-                <input type="text" id="id_factura" name="id_factura" required>
+    <main class="page">
+        <section class="hero">
+            <div class="hero__content">
+                <span class="badge">Generador de Facturas</span>
+                <h1>Convierte un número de factura en un PDF descargable</h1>
+                <p>
+                    Ingresa un identificador, consulta la API y genera una factura sintética con formato profesional.
+                </p>
             </div>
-            <button type="submit">Generar PDF</button>
-        </form>
-        
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <div class="alert">
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
+        </section>
+
+        <section class="card">
+            <div class="card__header">
+                <h2>Generar factura</h2>
+                <p>Escribe el nombre o código de la factura y descarga el PDF.</p>
+            </div>
+
+            <form id="invoice-form" method="POST" action="/generar-pdf" novalidate>
+                <div class="form-group">
+                    <label for="id_factura">ID de Factura</label>
+                    <input
+                        type="text"
+                        id="id_factura"
+                        name="id_factura"
+                        placeholder="Ej: FAC-2025-001"
+                        autocomplete="off"
+                        required
+                    >
+                    <small class="help-text">
+                        Usa un identificador como FAC-2025-001, INV-1001 o FACT-01.
+                    </small>
                 </div>
-            {% endif %}
-        {% endwith %}
-    </div>
+
+                <button type="submit" id="submit-btn">
+                    Generar PDF
+                </button>
+
+                <div class="status" id="status-message" aria-live="polite"></div>
+            </form>
+        </section>
+    
+    </main>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
