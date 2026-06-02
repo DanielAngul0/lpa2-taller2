@@ -4,52 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Facturas PDF</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <main class="page">
-        <section class="hero">
-            <div class="hero__content">
-                <span class="badge">Generador de Facturas</span>
-                <h1>Convierte un número de factura en un PDF descargable</h1>
-                <p>
-                    Ingresa un identificador, consulta la API y genera una factura sintética con formato profesional.
-                </p>
-            </div>
-        </section>
 
-        <section class="card">
-            <div class="card__header">
-                <h2>Generar factura</h2>
-                <p>Escribe el nombre o código de la factura y descarga el PDF.</p>
-            </div>
+<div class="app-shell">
 
-            <form id="invoice-form" method="POST" action="/generar-pdf" novalidate>
-                <div class="form-group">
-                    <label for="id_factura">ID de Factura</label>
-                    <input
-                        type="text"
-                        id="id_factura"
-                        name="id_factura"
-                        placeholder="Ej: FAC-2025-001"
-                        autocomplete="off"
-                        required
-                    >
-                    <small class="help-text">
-                        Usa un identificador como FAC-2025-001, INV-1001 o FACT-01.
-                    </small>
+    <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+    <aside class="sidebar">
+        <div class="sidebar__brand">
+            <div class="brand-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
+                </svg>
+            </div>
+            <span class="brand-name">FacturaPDF</span>
+        </div>
+
+        <nav class="sidebar__nav">
+            <button class="nav-item nav-item--active" data-view="generator">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+                Generar
+            </button>
+            <button class="nav-item" data-view="history" id="nav-history">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="12 8 12 12 14 14"/><circle cx="12" cy="12" r="10"/>
+                </svg>
+                Historial
+                <span class="nav-badge" id="history-count" style="display:none">0</span>
+            </button>
+        </nav>
+    </aside>
+
+    <!-- ═══════════════════════════ MAIN ═══════════════════════════ -->
+    <main class="main-content">
+
+        <!-- ─── VIEW: GENERADOR ─── -->
+        <div class="view" id="view-generator">
+            <header class="view-header">
+                <div class="view-header__text">
+                    <h1>Generar Factura</h1>
+                    <p>Ingresa un identificador y obtén tu PDF al instante.</p>
+                </div>
+            </header>
+
+            <div class="generator-layout">
+                <div class="form-card">
+                    <form id="invoice-form" novalidate>
+                        <div class="field">
+                            <label for="id_factura">Número de factura</label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                                </svg>
+                                <input
+                                    type="text"
+                                    id="id_factura"
+                                    name="id_factura"
+                                    placeholder="FAC-2025-001"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                    required
+                                >
+                            </div>
+                            <small class="field-hint">Usa un código como FAC-2025-001, INV-1001 o FACT-01</small>
+                        </div>
+
+                        <button type="submit" id="submit-btn" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Generar y Descargar PDF
+                        </button>
+
+                        <div class="status-bar" id="status-message" aria-live="polite"></div>
+                    </form>
                 </div>
 
-                <button type="submit" id="submit-btn">
-                    Generar PDF
+                <div class="info-strip">
+                    <div class="info-item">
+                        <div class="info-item__icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <strong>Datos sintéticos</strong>
+                            <span>Generados con Faker en tiempo real</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-item__icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <strong>PDF profesional</strong>
+                            <span>Generado con ReportLab en el servidor</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-item__icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="12 8 12 12 14 14"/><circle cx="12" cy="12" r="10"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <strong>Historial de sesión</strong>
+                            <span>Consulta y descarga facturas anteriores</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── VIEW: HISTORIAL ─── -->
+        <div class="view view--hidden" id="view-history">
+            <header class="view-header">
+                <div class="view-header__text">
+                    <h1>Historial</h1>
+                    <p>Facturas generadas en esta sesión.</p>
+                </div>
+                <button class="btn-ghost btn-sm" id="btn-clear-all" title="Limpiar todo el historial">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+                    </svg>
+                    Limpiar todo
                 </button>
+            </header>
 
-                <div class="status" id="status-message" aria-live="polite"></div>
-            </form>
-        </section>
-    
+            <div class="history-layout" id="history-layout">
+
+                <!-- Lista -->
+                <div class="history-list-col">
+                    <div class="history-list" id="history-list">
+                        <div class="empty-state" id="empty-state">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <p>No has generado ninguna factura aún.</p>
+                            <button class="btn-ghost btn-sm" onclick="switchView('generator')">Generar una</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de preview -->
+                <div class="preview-col" id="preview-col">
+                    <div class="preview-placeholder" id="preview-placeholder">
+                        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <p>Selecciona una factura<br>para previsualizar</p>
+                    </div>
+                    <div class="preview-panel" id="preview-panel" style="display:none">
+                        <!-- Llenado dinámicamente -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </main>
+</div>
 
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
